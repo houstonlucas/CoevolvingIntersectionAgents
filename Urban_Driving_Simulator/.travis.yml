@@ -1,0 +1,23 @@
+language: python
+python:
+  - "3.6"
+
+# command to install dependencies
+install:
+  - pip install -e .
+  - pip install -e gym_fluids
+  - pip install sphinx==1.6.5 recommonmark sphinx_rtd_theme pyyaml coveralls
+
+env:
+  global:
+    - SDL_AUDIODRIVER=disk
+
+# command to run tests
+script:
+  - make -C docs html
+  - make test
+  - make coverage
+after_success:
+  - coveralls
+
+

@@ -1,0 +1,6 @@
+pygame
+numpy
+scipy
+shapely
+ortools
+pillow
