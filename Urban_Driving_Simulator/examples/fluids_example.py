@@ -10,7 +10,7 @@ simulator = fluids.FluidSim(visualization_level=1,        # How much debug visua
 state = fluids.State(
     layout=fluids.STATE_CITY,
     background_cars=10,           # How many background cars
-    background_peds=10,
+    background_peds=0,
     controlled_cars=1,            # How many cars to control. Set to 0 for background cars only
     )
 
@@ -18,7 +18,9 @@ simulator.set_state(state)
 
 car_keys = simulator.get_control_keys()
 
-while True:
+import time
+start = time.time()
+while time.time() - start < 100:
     actions = {}
 
     # Uncomment any of these lines.
