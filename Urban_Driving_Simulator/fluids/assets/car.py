@@ -23,7 +23,7 @@ def integrator(state, t, steer, acc, lr, lf):
     return dx, dy, dvel, dangle
 
 class Car(Shape):
-    def __init__(self, vel=0, mass=400, max_vel=5,
+    def __init__(self, vel=0, mass=1700, max_vel=10,
                  planning_depth=20, **kwargs):
         from fluids.assets import Lane, Car, Pedestrian, TrafficLight, Terrain, Sidewalk, PedCrossing
         collideables = [Lane,
@@ -75,7 +75,7 @@ class Car(Shape):
 
     def raw_step(self, steer, f_acc):
         steer = max(min(1, steer), -1)
-        f_acc = max(min(1, f_acc), -1)
+        f_acc = max(min(3, f_acc), -3)
         steer = np.radians(30 * steer)
         acc = 100 * f_acc / self.mass
 
