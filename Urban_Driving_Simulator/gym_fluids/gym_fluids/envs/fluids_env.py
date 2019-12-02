@@ -17,7 +17,7 @@ FLUIDS_ARGS = {"visualization_level"      :1,
 STATE_ARGS = {"layout": fluids.STATE_CITY,
               "background_cars"          :10,
               "controlled_cars"          :1,
-              "background_peds"          :5,
+              "background_peds"          :0,
               }
 
 
