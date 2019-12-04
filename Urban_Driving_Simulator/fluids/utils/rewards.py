@@ -1,18 +1,31 @@
 def path_reward(state):
+    total_reward = 0
+
     # Get cars
     controlled_cars = [state.objects[k] for k in state.controlled_cars.keys()]
 
-    # Calculate collisions
-    collisions = sum([-500 if state.is_in_collision(car) else 0 for car in controlled_cars])
+    # Loop over every car
+    for c in controlled_cars:
+        # Calc collisions
+        collision = -500 if state.is_in_collision(c) else 0
 
-    # Calculate liveliness
-    liveliness = -1.0*sum([c.total_time for c in controlled_cars])
+        # get liveliness
+        liveliness = -1.0*c.total_time
 
-    # Calculate Jerk
-    total_jerk = -1.0*sum([c.jerk for c in controlled_cars])
+        # get jerk
+        jerk = -1.0*c.jerk
 
-    # Calculate trajectory following
-    traj_follow = sum([c.last_to_goal for c in controlled_cars])
+        # get traj_follow
+        traj_follow = c.last_to_goal
+
+        # calc reward
+        reward = collision + liveliness + jerk + traj_follow
+
+        # update reward for car
+        c.current_reward = reward
+
+        # add reward to total
+        total_reward += reward
 
     # Return final metric
-    return traj_follow + collisions + liveliness + total_jerk
+    return total_reward
