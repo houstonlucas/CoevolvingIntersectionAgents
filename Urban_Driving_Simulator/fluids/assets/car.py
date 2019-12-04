@@ -23,6 +23,24 @@ def integrator(state, t, steer, acc, lr, lf):
     return dx, dy, dvel, dangle
 
 
+def calc_jerk(last_four_positions):
+    # Assuming dt = 1, since we really don't know
+
+    last_three_velocities = []
+    for i in range(len(last_four_positions) - 1):
+        last_three_velocities.append(last_four_positions[i + 1] - last_four_positions[i])
+
+    last_two_accelerations = []
+    for i in range(len(last_three_velocities) - 1):
+        last_two_accelerations.append(last_three_velocities[i + 1] - last_three_velocities[i])
+
+    jerk = last_two_accelerations[1] - last_two_accelerations[0]
+
+    jerk_val = np.linalg.norm(jerk)
+
+    return jerk_val
+
+
 class Car(Shape):
     def __init__(self, vel=0, mass=400, max_vel=5,
                  planning_depth=20, **kwargs):
@@ -57,6 +75,14 @@ class Car(Shape):
         self.stopped_time = 0
         self.running_time = 0
         self.total_time = 0
+
+        # Initializing them to the same thing for now
+        self.last_four_positions = [np.asarray((self.x, self.y)),
+                                    np.asarray((self.x, self.y)),
+                                    np.asarray((self.x, self.y)),
+                                    np.asarray((self.x, self.y))]
+
+        self.jerk = calc_jerk(self.last_four_positions)
 
         self.last_blob_time = -1
         self.cached_blob = self.get_future_shape()
@@ -101,7 +127,7 @@ class Car(Shape):
         distance_to_next = self.dist_to(self.waypoints[0])
         startx, starty = self.x, self.y
 
-        if action == None:
+        if action is None:
             self.raw_step(0, 0)
             self.last_action = action
         elif type(action) == SteeringAccAction:
@@ -146,7 +172,15 @@ class Car(Shape):
             if len(self.trajectory):
                 self.trajectory.pop(0)
 
+        # Update time for liveliness reward metric
         self.total_time += 1
+
+        # Update positions
+        self.last_four_positions.pop(0)
+        self.last_four_positions.append(np.asarray((self.x, self.y)))
+
+        # Update jerk for jerk reward metric
+        self.jerk = calc_jerk(self.last_four_positions)
 
         return
 
