@@ -13,7 +13,12 @@ def path_reward(state):
     # Loop over every car
     for c in controlled_cars:
         # Calc collisions
-        collision = -1.0 if state.is_in_collision(c) else 0
+
+        if state.is_in_collision(c):
+            collision = -1.0
+            c.collisions += 1
+        else:
+            collision = 0.0
 
         # get liveliness
         liveliness = -1.0 * c.total_time
