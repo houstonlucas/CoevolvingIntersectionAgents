@@ -1,1 +1,1 @@
-from gym_fluids.envs.fluids_env import FluidsEnv, FluidsVelEnv
+from gym_fluids.envs.fluids_env import FluidsEnv, FluidsEnv1, FluidsVelEnv

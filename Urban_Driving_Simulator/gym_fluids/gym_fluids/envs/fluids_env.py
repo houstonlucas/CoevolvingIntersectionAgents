@@ -4,21 +4,28 @@ import numpy as np
 import gym
 from gym import spaces
 
-
 OBS_W = 400
 TIME_LIMIT = 600
 
-FLUIDS_ARGS = {"visualization_level"      :1,
-               "fps"                      :30,
-               "obs_args"                 :{"obs_dim":OBS_W},
-               "obs_space"                :fluids.OBS_BIRDSEYE,
-               "background_control"       :fluids.BACKGROUND_CSP}
+FLUIDS_ARGS = {"visualization_level": 3,
+               "fps": 30,
+               "obs_args": {"obs_dim": OBS_W},
+               "obs_space": fluids.OBS_GRID,
+               "background_control": fluids.BACKGROUND_CSP}
 
 STATE_ARGS = {"layout": fluids.STATE_CITY,
-              "background_cars"          :10,
-              "controlled_cars"          :1,
-              "background_peds"          :0,
+              "background_cars": 10,
+              "controlled_cars": 1,
+              "background_peds": 0,
               }
+
+STATE_ARGS_1 = {"layout": fluids.STATE_CITY,
+                "background_cars": 1,
+                "controlled_cars": 1,
+                "background_peds": 0,
+                "set_car": [(1, .5, .05), (0, .5, .05)],
+                "set_path": [2, 1],
+                }
 
 
 class FluidsEnv(gym.Env):
@@ -26,37 +33,47 @@ class FluidsEnv(gym.Env):
         self.fluidsim = fluids.FluidSim(**FLUIDS_ARGS)
         self.action_space = spaces.Box(np.array([-1, -1]), np.array([1, 1]))
         self.observation_space = spaces.Box(low=0, high=255, shape=(OBS_W, OBS_W, 3), dtype=np.uint8)
-
         self.fluids_action_type = fluids.SteeringAccAction
-        
+
     def reset(self):
         self.fluidsim.set_state(fluids.State(**STATE_ARGS))
         car_keys = list(self.fluidsim.get_control_keys())
-        assert(len(car_keys) == 1)
+        assert (len(car_keys) == 1)
         obs = self.fluidsim.get_observations(car_keys)
         return obs[car_keys[0]].get_array()
 
     def fluids_action_maker(self, action):
         return fluids.SteeringAccAction(action[0], action[1])
 
-
     def step(self, action):
         car_keys = list(self.fluidsim.get_control_keys())
-        assert(len(car_keys) == 1)
+        assert (len(car_keys) == 1)
         actions = {car_keys[0]: self.fluids_action_maker(action)}
         reward_step = self.fluidsim.step(actions)
         obs = self.fluidsim.get_observations(car_keys)
 
         done = self.fluidsim.run_time() > TIME_LIMIT
         obs = obs[car_keys[0]].get_array()
-        info_dict = {"supervisor_action":self.fluidsim.get_supervisor_actions(keys=car_keys,
-                                                                              action_type=self.fluids_action_type)
-                     [car_keys[0]].get_array()}
+        info_dict = {"supervisor_action": self.fluidsim.get_supervisor_actions(keys=car_keys,
+                                                                               action_type=self.fluids_action_type)
+        [car_keys[0]].get_array()}
         return obs, reward_step, done, info_dict
-
 
     def render(self, mode='human'):
         self.fluidsim.render()
+
+
+class FluidsEnv1(FluidsEnv):
+    def __init__(self):
+        super(FluidsEnv1, self).__init__()
+
+    def reset(self):
+        self.fluidsim.set_state(fluids.State(**STATE_ARGS_1))
+        car_keys = list(self.fluidsim.get_control_keys())
+        assert (len(car_keys) == 1)
+        obs = self.fluidsim.get_observations(car_keys)
+        return obs[car_keys[0]].get_array()
+
 
 class FluidsVelEnv(FluidsEnv):
     def __init__(self):

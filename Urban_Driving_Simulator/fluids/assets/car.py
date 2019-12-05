@@ -43,7 +43,7 @@ def calc_jerk(last_four_positions):
 
 class Car(Shape):
     def __init__(self, vel=0, mass=400, max_vel=5,
-                 planning_depth=20, **kwargs):
+                 planning_depth=10, path=-1, **kwargs):
         from fluids.assets import Lane, Car, Pedestrian, TrafficLight, Terrain, Sidewalk, PedCrossing
         collideables = [Lane,
                         Car,
@@ -86,6 +86,8 @@ class Car(Shape):
 
         self.last_blob_time = -1
         self.cached_blob = self.get_future_shape()
+        self.path = path
+        self.keep_random = False
 
     def make_observation(self, obs_space=OBS_NONE, **kwargs):
         if obs_space == OBS_NONE:
@@ -151,12 +153,20 @@ class Car(Shape):
             return
         else:
             fluids_assert(False, "Car received an illegal action")
+
         while len(self.waypoints) < self.planning_depth and len(self.waypoints) and len(self.waypoints[-1].nxt):
-            next_edge = random.choice(self.waypoints[-1].nxt)
+            if len(self.waypoints[-1].nxt) > 1:
+                if self.path == -1 or self.keep_random:
+                    next_edge = random.choice(self.waypoints[-1].nxt)
+                else:
+                    next_edge = self.waypoints[-1].nxt[self.path]
+                    self.keep_random = True
+            else:
+                next_edge = self.waypoints[-1].nxt[0]
+
             next_waypoint = next_edge.out_p
             line = next_edge.shapely_obj
-            # line = shapely.geometry.LineString([(self.waypoints[-1].x, self.waypoints[-1].y),
-            #                                     (next_waypoint.x, next_waypoint.y)]).buffer(self.ydim*0.5)
+
             self.trajectory.append(((self.waypoints[-1].x, self.waypoints[-1].y),
                                     (next_waypoint.x, next_waypoint.y), line))
             self.waypoints.append(next_waypoint)
