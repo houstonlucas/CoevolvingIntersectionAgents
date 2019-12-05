@@ -74,15 +74,24 @@ class Car(Shape):
         self.last_to_goal = 0
         self.stopped_time = 0
         self.running_time = 0
-        self.total_time = 0
 
-        # Initializing them to the same thing for now
+        # Rewards metrics
         self.last_four_positions = [np.asarray((self.x, self.y)),
                                     np.asarray((self.x, self.y)),
                                     np.asarray((self.x, self.y)),
                                     np.asarray((self.x, self.y))]
 
         self.jerk = calc_jerk(self.last_four_positions)
+
+        # Current reward
+        self.current_reward = 0.0
+
+        # Total reward
+        self.total_collisions = 0.0
+        self.total_time = 0.0
+        self.total_jerk = self.jerk
+        self.total_traj_follow = self.last_to_goal
+        self.total_reward = 0.0
 
         self.last_blob_time = -1
         self.cached_blob = self.get_future_shape()
@@ -182,15 +191,21 @@ class Car(Shape):
             if len(self.trajectory):
                 self.trajectory.pop(0)
 
-        # Update time for liveliness reward metric
-        self.total_time += 1
-
         # Update positions
         self.last_four_positions.pop(0)
         self.last_four_positions.append(np.asarray((self.x, self.y)))
 
         # Update jerk for jerk reward metric
         self.jerk = calc_jerk(self.last_four_positions)
+
+        # Update total reward
+        # Collisions are handled by the rewards function
+        self.total_time += 1
+        self.total_jerk += self.jerk
+        self.total_traj_follow += self.last_to_goal
+
+        # This might cause issues because current reward is only updated when the reward function is called
+        self.total_reward += self.current_reward
 
         return
 
