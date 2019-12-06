@@ -212,7 +212,7 @@ class State(object):
                     start = lanes[lane]
                     x = start.minx + lane_place * (start.maxx - start.minx)
                     y = start.miny + .5 * (start.maxy - start.miny)
-                    angle = start.angle + angle_offset
+                    angle = start.angle + angle_offset + np.random.uniform(-0.1, 0.1)
                 else:
                     start = lanes[np.random.random_integers(0, len(lanes) - 1)]
                     x = np.random.uniform(start.minx + 50, start.maxx - 50)
