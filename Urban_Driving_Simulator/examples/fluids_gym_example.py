@@ -1,6 +1,5 @@
 import gym
 import gym_fluids
-import PIL
 from matplotlib import pyplot as plt
 
 env = gym.make('fluids-1-v2')
