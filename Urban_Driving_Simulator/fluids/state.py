@@ -57,7 +57,7 @@ class State(object):
                  vis_level=1,
                  set_car=None,
                  set_path=None):
-
+        ################### LOADING LAYOUT ###################
         fluids_print("Loading layout: " + layout)
         layout = open(os.path.join(basedir, "layouts", layout + ".json"))
         cfilename = "{}{}.json".format(
@@ -85,9 +85,11 @@ class State(object):
                            layout['dimension_y'])
         self.vis_level = vis_level
 
+        ################### CREATING OBJECTS ###################
         lanes = []
         sidewalks = []
         fluids_print("Creating objects")
+        # Static Objects: Things that DON'T change
         for obj_info in layout['static_objects']:
             typ = {"Terrain": Terrain,
                    "Lane": Lane,
@@ -109,6 +111,7 @@ class State(object):
             self.static_objects[key] = obj
             obj_info['fluids_obj'] = obj
         car_ids = []
+        # Dynamic Objects: Things that DO change
         for obj_info in layout['dynamic_objects']:
             typ = {"Car": Car,
                    "TrafficLight": TrafficLight,
@@ -126,12 +129,14 @@ class State(object):
             self.objects[key] = obj
             self.dynamic_objects[key] = obj
 
+        ################### TRAJECTORY MAP ###################
         fluids_print("Generating trajectory map")
         if 'waypoints' in layout:
             wp_map = {}
             self.waypoints = []
             self.ped_waypoints = []
 
+            # Car waypoints
             for wp_info in layout['waypoints']:
                 index = wp_info.pop('index')
                 wp = Waypoint(owner=None, ydim=waypoint_width, **wp_info)
@@ -140,6 +145,7 @@ class State(object):
             for wp in self.waypoints:
                 wp.nxt = [wp_map[index] for index in wp.nxt]
 
+            # Pedestrain waypoints
             for wp_info in layout['ped_waypoints']:
                 index = wp_info.pop('index')
                 wp = Waypoint(owner=None, **wp_info)
@@ -148,6 +154,7 @@ class State(object):
             for wp in self.ped_waypoints:
                 wp.nxt = [wp_map[index] for index in wp.nxt]
 
+            # More waypoints???
             for k, obj in iteritems(self.objects):
                 obj.waypoints = [wp_map[i] for i in obj.waypoints]
                 for wp in obj.waypoints:
@@ -164,7 +171,7 @@ class State(object):
 
         else:
             self.generate_waypoints_init()
-
+            # what is going on
             layout['waypoints'] = []
             layout['ped_waypoints'] = []
             for wp in self.waypoints:
@@ -191,9 +198,12 @@ class State(object):
         for waypoint in self.ped_waypoints:
             waypoint.create_edges(buff=5)
 
+        ################### CARS ###################
         fluids_print("Generating cars")
         for i in range(controlled_cars + background_cars):
 
+            # Either set the path to the given coordinates
+            # Or randomize start position
             while True:
                 if set_car:
                     lane = set_car[i][0]
@@ -214,11 +224,17 @@ class State(object):
                 else:
                     car_path = set_path[i]
 
+                # Supposedly this is where you check collisions????
+                # Create the car with the previous coordinates
                 car = Car(state=self, x=x, y=y, angle=angle, vis_level=vis_level, path=car_path)
+                # Find the minimum distance to any other car
                 min_d = min([car.dist_to(other) for k, other \
                              in iteritems(self.type_map[Car])] + [np.inf])
+
+                # If the min distance is bigger than 10 and we're not already colliding
                 if min_d > 10 and not self.is_in_collision(car):
                     key = get_id()
+                    # Go through the waypoints and take random waypoints?
                     for waypoint in self.waypoints:
                         if car.intersects(waypoint):
                             while car.intersects(waypoint):
@@ -231,6 +247,7 @@ class State(object):
                     car_ids.append(key)
                     self.dynamic_objects[key] = car
                     break
+                # If you get past the last break statement, then you're in collision
                 print(f'{key + 1} in collision')
 
         self.controlled_cars = {k: self.objects[k] for k in car_ids[:controlled_cars]}
@@ -238,6 +255,7 @@ class State(object):
             car.color = (0x0b, 0x04, 0xf4)  # (0x5B,0x5C,0xF7)
         self.background_cars = {k: self.objects[k] for k in car_ids[controlled_cars:]}
 
+        ################### PEDESTRIANS ###################
         fluids_print("Generating peds")
         for i in range(background_peds):
             while True:
@@ -254,11 +272,14 @@ class State(object):
                     self.dynamic_objects[key] = obj
                     break
 
+        # CACHING????
         if not cache_found:
             fluids_print("Caching layout to: " + cfilename)
             with open(get_cache_filename(cfilename), "w") as outfile:
                 json.dump(layout, outfile, indent=1)
         fluids_print("State creation complete")
+        ################### DONE ###################
+        ################### VISUALIZATION ###################
         if vis_level:
             self.static_surface = pygame.Surface(self.dimensions)
             try:
