@@ -20,10 +20,26 @@ STATE_ARGS = {"layout": fluids.STATE_CITY,
               }
 
 STATE_ARGS_1 = {"layout": fluids.STATE_CITY,
+                "background_cars": 0,
+                "controlled_cars": 1,
+                "background_peds": 0,
+                "set_car": [(4, .5, 0.0)],
+                "set_path": [2],
+                }
+
+STATE_ARGS_2 = {"layout": fluids.STATE_CITY,
                 "background_cars": 1,
                 "controlled_cars": 1,
                 "background_peds": 0,
-                "set_car": [(1, .5, .05), (0, .5, .05)],
+                "set_car": [(1, .5, 0.0), (2, .75, 0.0)],
+                "set_path": [1, 0],
+                }
+
+STATE_ARGS_3 = {"layout": fluids.STATE_CITY,
+                "background_cars": 1,
+                "controlled_cars": 1,
+                "background_peds": 0,
+                "set_car": [(2, .25, 0.0), (1, .75, 0.0)],
                 "set_path": [2, 1],
                 }
 
@@ -69,6 +85,28 @@ class FluidsEnv1(FluidsEnv):
 
     def reset(self):
         self.fluidsim.set_state(fluids.State(**STATE_ARGS_1))
+        car_keys = list(self.fluidsim.get_control_keys())
+        assert (len(car_keys) == 1)
+        obs = self.fluidsim.get_observations(car_keys)
+        return obs[car_keys[0]].get_array()
+
+class FluidsEnv2(FluidsEnv):
+    def __init__(self):
+        super(FluidsEnv2, self).__init__()
+
+    def reset(self):
+        self.fluidsim.set_state(fluids.State(**STATE_ARGS_2))
+        car_keys = list(self.fluidsim.get_control_keys())
+        assert (len(car_keys) == 1)
+        obs = self.fluidsim.get_observations(car_keys)
+        return obs[car_keys[0]].get_array()
+
+class FluidsEnv3(FluidsEnv):
+    def __init__(self):
+        super(FluidsEnv3, self).__init__()
+
+    def reset(self):
+        self.fluidsim.set_state(fluids.State(**STATE_ARGS_3))
         car_keys = list(self.fluidsim.get_control_keys())
         assert (len(car_keys) == 1)
         obs = self.fluidsim.get_observations(car_keys)

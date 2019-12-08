@@ -15,6 +15,20 @@ register(
     )
 
 register(
+    id="fluids-2-v2",
+    entry_point="gym_fluids.envs:FluidsEnv2",
+    max_episode_steps=1000,
+    nondeterministic=True
+    )
+
+register(
+    id="fluids-3-v2",
+    entry_point="gym_fluids.envs:FluidsEnv3",
+    max_episode_steps=1000,
+    nondeterministic=True
+    )
+
+register(
     id="fluids-vel-v2",
     entry_point="gym_fluids.envs:FluidsVelEnv",
     max_episode_steps=1000,
