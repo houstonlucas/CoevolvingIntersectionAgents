@@ -39,8 +39,8 @@ STATE_ARGS_3 = {"layout": fluids.STATE_CITY,
                 "background_cars": 1,
                 "controlled_cars": 1,
                 "background_peds": 0,
-                "set_car": [(1, .5, 0.0), (2, .75, 0.0)],
-                "set_path": [1, 0],
+                "set_car": [(2, .25, 0.0), (1, .75, 0.0)],
+                "set_path": [2, 1],
                 }
 
 
@@ -106,7 +106,7 @@ class FluidsEnv3(FluidsEnv):
         super(FluidsEnv3, self).__init__()
 
     def reset(self):
-        self.fluidsim.set_state(fluids.State(**STATE_ARGS_2))
+        self.fluidsim.set_state(fluids.State(**STATE_ARGS_3))
         car_keys = list(self.fluidsim.get_control_keys())
         assert (len(car_keys) == 1)
         obs = self.fluidsim.get_observations(car_keys)
