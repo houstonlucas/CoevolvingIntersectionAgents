@@ -232,7 +232,7 @@ class State(object):
                              in iteritems(self.type_map[Car])] + [np.inf])
 
                 # If the min distance is bigger than 10 and we're not already colliding
-                if min_d > 10 and not self.is_in_collision(car):
+                if min_d > 10 and not self.is_in_collision(car) and not self.is_in_infraction(car):
                     key = get_id()
                     # Go through the waypoints and take random waypoints?
                     for waypoint in self.waypoints:
@@ -401,10 +401,29 @@ class State(object):
                         return True
         return False
 
+    def is_in_infraction(self, obj):
+        infractables = obj.infractables
+        for ctype in infractables:
+            if ctype in self.type_map:
+                for k, other in iteritems(self.type_map[ctype]):
+                    if obj.collides(other):
+                        return True
+        return False
+
     def min_distance_to_collision(self, obj):
         collideables = obj.collideables
         mind = 0
         for ctype in collideables:
+            for k, other in iteritems(self.type_map[ctype]):
+                d = obj.dist_to(other)
+                if d < mind:
+                    mind = d
+        return mind
+
+    def min_distance_to_infraction(self, obj):
+        infractables = obj.infractables
+        mind = 0
+        for ctype in infractables:
             for k, other in iteritems(self.type_map[ctype]):
                 d = obj.dist_to(other)
                 if d < mind:

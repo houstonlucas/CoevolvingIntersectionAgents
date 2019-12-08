@@ -45,15 +45,16 @@ class Car(Shape):
     def __init__(self, vel=0, mass=400, max_vel=5,
                  planning_depth=10, path=-1, **kwargs):
         from fluids.assets import Lane, Car, Pedestrian, TrafficLight, Terrain, Sidewalk, PedCrossing
-        collideables = [Lane,
-                        Car,
-                        Pedestrian,
+        collideables = [Car,
+                        Pedestrian]
+        infractables = [Lane,
                         TrafficLight,
                         Terrain,
                         Sidewalk,
                         PedCrossing]
         Shape.__init__(self,
                        collideables=collideables,
+                       infractables=infractables,
                        color=(0x1d, 0xb1, 0xb0),  # 769BB0
                        xdim=70,
                        ydim=35,
@@ -88,6 +89,7 @@ class Car(Shape):
 
         # Total reward
         self.total_collisions = 0.0
+        self.total_infractions = 0.0
         self.total_time = 0.0
         self.total_jerk = self.jerk
         self.total_traj_follow = self.last_to_goal

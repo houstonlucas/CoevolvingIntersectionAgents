@@ -1,4 +1,5 @@
 COLLISION_WEIGHT = 500.0
+INFRACTION_WEIGHT = 500.0
 LIVELINESS_WEIGHT = 1.0
 JERK_WEIGHT = 1.0
 TRAJ_WEIGHT = 1.0
@@ -13,12 +14,18 @@ def path_reward(state):
     # Loop over every car
     for c in controlled_cars:
         # Calc collisions
-
         if state.is_in_collision(c):
             collision = -1.0
-            c.collisions += 1
+            c.total_collisions += 1
         else:
             collision = 0.0
+
+        # Calc infractions
+        if state.is_in_infraction(c):
+            infraction = -1.0
+            c.total_infractions += 1
+        else:
+            infraction = 0.0
 
         # get liveliness
         liveliness = -1.0 * c.total_time
@@ -30,8 +37,8 @@ def path_reward(state):
         traj_follow = c.last_to_goal
 
         # calc reward
-        reward = COLLISION_WEIGHT * collision + LIVELINESS_WEIGHT * liveliness + \
-                 JERK_WEIGHT * jerk + TRAJ_WEIGHT * traj_follow
+        reward = COLLISION_WEIGHT * collision + INFRACTION_WEIGHT * infraction + \
+                 LIVELINESS_WEIGHT * liveliness + JERK_WEIGHT * jerk + TRAJ_WEIGHT * traj_follow
 
         # update reward for car
         c.current_reward = reward
