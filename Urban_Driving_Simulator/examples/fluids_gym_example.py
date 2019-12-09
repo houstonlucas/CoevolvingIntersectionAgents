@@ -11,13 +11,8 @@ done = False
 while True:
     obs, rew, done, info = env.step(action)
     reward += rew
-
-    # plt.imshow(obs)
-    # plt.show()
-    # plt.close()
-
     env.render()
-    print(rew, action)
+
     if done:
         break
     action = gym_fluids.agents.fluids_supervisor(obs, info)

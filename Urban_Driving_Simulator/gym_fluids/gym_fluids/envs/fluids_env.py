@@ -7,7 +7,7 @@ from gym import spaces
 OBS_W = 400
 TIME_LIMIT = 600
 
-FLUIDS_ARGS = {"visualization_level": 3,
+FLUIDS_ARGS = {"visualization_level": 0,
                "fps": 30,
                "obs_args": {"obs_dim": OBS_W},
                "obs_space": fluids.OBS_VEC,
