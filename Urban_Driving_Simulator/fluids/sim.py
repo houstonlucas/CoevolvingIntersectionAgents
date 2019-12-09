@@ -8,7 +8,6 @@ from copy import deepcopy
 
 from shapely import speedups
 
-
 if speedups.available:
     speedups.enable()
 
@@ -19,8 +18,6 @@ from fluids.actions import *
 from fluids.consts import *
 from fluids.obs import GridObservation
 from fluids.datasaver import DataSaver
-
-
 
 
 class FluidSim(object):
@@ -49,38 +46,38 @@ class FluidSim(object):
     screen_dim: int
         Height of the visualization screen. Default is 800
     """
+
     def __init__(self,
-                 visualization_level =1,
-                 fps                 =30,
-                 obs_space           =OBS_NONE,
-                 obs_args            ={},
-                 background_control  =BACKGROUND_NULL,
-                 reward_fn           =REWARD_PATH,
-                 screen_dim          =800,
+                 visualization_level=1,
+                 fps=30,
+                 obs_space=OBS_NONE,
+                 obs_args={},
+                 background_control=BACKGROUND_NULL,
+                 reward_fn=REWARD_PATH,
+                 screen_dim=800,
                  ):
 
-        self.state                 = None
-        self.screen_dim            = screen_dim
+        self.state = None
+        self.screen_dim = screen_dim
         if visualization_level:
             pygame.init()
             pygame.font.init()
-            self.fps_font    = pygame.font.SysFont('Mono', 30)
+            self.fps_font = pygame.font.SysFont('Mono', 30)
             self.fps_surface = self.fps_font.render("0", False, (0, 0, 0))
-            #self.surface     = pygame.display.set_mode(self.screen_dim)
-        self.clock   = pygame.time.Clock()
+            # self.surface     = pygame.display.set_mode(self.screen_dim)
+        self.clock = pygame.time.Clock()
 
-        self.obs_space             = obs_space
-        self.obs_args              = obs_args
-        self.reward_fn             = {REWARD_PATH    : path_reward,
-                                      REWARD_NONE    : lambda s : 0}[reward_fn]
-        self.background_control    = background_control
-        self.vis_level             = visualization_level
-        self.fps                   = fps
-        self.last_keys_pressed     = None
-        self.last_obs              = {}
-        self.next_actions          = {}
+        self.obs_space = obs_space
+        self.obs_args = obs_args
+        self.reward_fn = {REWARD_PATH: path_reward,
+                          REWARD_NONE: lambda s: 0}[reward_fn]
+        self.background_control = background_control
+        self.vis_level = visualization_level
+        self.fps = fps
+        self.last_keys_pressed = None
+        self.last_obs = {}
+        self.next_actions = {}
         self.data_saver = None
-
 
     def __del__(self):
         pygame.quit()
@@ -107,7 +104,6 @@ class FluidSim(object):
         fluids_assert(type(self.data_saver) == DataSaver,
                       "data_saver object must be of type DataSaver")
         self.data_saver.accumulate()
-
 
     def render(self):
         if not self.state:
@@ -169,7 +165,6 @@ class FluidSim(object):
             if not self.state.time % 60:
                 fluids_print("FPS: " + str(int(self.clock.get_fps())))
 
-
     def get_control_keys(self):
         """
         Returns
@@ -222,7 +217,6 @@ class FluidSim(object):
             elif type(v) == SteeringAction:
                 action = self.next_actions
 
-
         # Simulate the objects
         for k, v in iteritems(self.state.dynamic_objects):
             tempdone = self.state.objects[k].step(self.next_actions[k] if k in self.next_actions \
@@ -243,7 +237,7 @@ class FluidSim(object):
         self.state.time += 1
 
         reward_step = self.reward_fn(self.state)
-        #print(reward_step)
+        # print(reward_step)
 
         # Get background vehicle and pedestrian controls
         self.multiagent_plan()
@@ -266,8 +260,8 @@ class FluidSim(object):
             Dictionary mapping keys of controlled cars to FluidsObs object
         """
         fluids_assert(self.state, "get_observations called without setting the state")
-        observations = {k:self.state.objects[k].make_observation(self.obs_space,
-                                                                 **self.obs_args)
+        observations = {k: self.state.objects[k].make_observation(self.obs_space,
+                                                                  **self.obs_args)
                         for k in keys}
         self.last_obs = observations
         return observations
@@ -289,19 +283,19 @@ class FluidSim(object):
             Dictionary mapping car keys to actions
         """
         if action_type == VelocityAction:
-            return {k:self.next_actions[k] for k in keys}
+            return {k: self.next_actions[k] for k in keys}
         elif action_type == SteeringAccAction:
-            return {k:self.state.dynamic_objects[k].PIDController(self.next_actions[k],
-                                                                  update=False)
+            return {k: self.state.dynamic_objects[k].PIDController(self.next_actions[k],
+                                                                   update=False)
                     for k in keys}
         elif action_type == SteeringAction:
-            return {k:self.state.dynamic_objects[k].PIDController(
+            return {k: self.state.dynamic_objects[k].PIDController(
                 self.next_actions[k],
                 update=False).asSteeringAction() for k in keys}
         elif action_type == SteeringVelAction:
-            return {k:SteeringVelAction(self.state.dynamic_objects[k].PIDController(
+            return {k: SteeringVelAction(self.state.dynamic_objects[k].PIDController(
                 self.next_actions[k], update=False).get_action()[0],
-                                    self.next_actions[k].get_action())
+                                         self.next_actions[k].get_action())
                     for k in keys}
         else:
             fluids_assert(False, "Illegal action type")
@@ -314,17 +308,16 @@ class FluidSim(object):
         #     chooses to move
         # "Buffered_objs" represents a buffered region around the car, which is
         #     approximately where the car will occupy if it chooses to stop
-        futures            = { k:o.get_future_shape() \
-                               for k, o in iteritems(self.state.type_map[Car])}
-        futures_lights     = [(o, o.get_future_color()) \
-                              for k, o in iteritems(self.state.type_map[TrafficLight])]
+        futures = {k: o.get_future_shape() \
+                   for k, o in iteritems(self.state.type_map[Car])}
+        futures_lights = [(o, o.get_future_color()) \
+                          for k, o in iteritems(self.state.type_map[TrafficLight])]
         futures_crosswalks = [(o, o.get_future_color()) \
                               for k, o in iteritems(self.state.type_map[CrossWalkLight])]
-        futures_peds       = { k:o.get_future_shape() \
-                               for k, o in iteritems(self.state.type_map[Pedestrian])}
-        buffered_objs      = { k: o.shapely_obj.buffer(10) \
-                               for k, o in iteritems(self.state.type_map[Car])}
-
+        futures_peds = {k: o.get_future_shape() \
+                        for k, o in iteritems(self.state.type_map[Pedestrian])}
+        buffered_objs = {k: o.shapely_obj.buffer(10) \
+                         for k, o in iteritems(self.state.type_map[Car])}
 
         keys = list(futures.keys())
         ped_keys = list(futures_peds.keys())
@@ -403,7 +396,7 @@ class FluidSim(object):
                 # If the light will be rec, and the car will collide with it when it moves,
                 #  limit the movement of the car
                 if flc == "red" and futures[k1].intersects(fl.shapely_obj) \
-                   and not car1.intersects(fl):
+                        and not car1.intersects(fl):
                     solver.Add(k1v == 0)
 
         # For every ped-light pair
@@ -418,7 +411,7 @@ class FluidSim(object):
 
         # Solve the CSP, try to assign max allowable velocity to every car/pedestrian
         #  (everything stop is a trivial solution)
-        db = solver.Phase(sorted([v for k,v in iteritems(var_map)]),
+        db = solver.Phase(sorted([v for k, v in iteritems(var_map)]),
                           solver.CHOOSE_FIRST_UNBOUND,
                           solver.ASSIGN_MAX_VALUE)
         solver.NewSearch(db)
@@ -430,20 +423,17 @@ class FluidSim(object):
         for k, v in iteritems(var_map):
             if k in self.state.type_map[Car]:
 
-                    actions[k] = VelocityAction(v.Value()*0.7)
+                actions[k] = VelocityAction(v.Value() * 0.7)
 
             elif k in self.state.type_map[Pedestrian]:
 
-                    actions[k] = v.Value()
-
+                actions[k] = v.Value()
 
         self.next_actions = actions
-
 
     def run_time(self):
         fluids_assert(self.state, "run_time called without setting the state")
         return self.state.time
-
 
     def in_deadlock(self):
         """
@@ -461,6 +451,6 @@ class FluidSim(object):
         If car_keys is just one key, returns bool
         """
         if type(car_keys) != int:
-            return {k:self.state.is_in_collision(self.state.type_map[Car][k]) for k in car_keys}
+            return {k: self.state.is_in_collision(self.state.type_map[Car][k]) for k in car_keys}
         else:
             return self.state.is_in_collision(self.state.type_map[Car][car_keys])

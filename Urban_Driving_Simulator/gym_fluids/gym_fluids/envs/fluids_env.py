@@ -10,7 +10,7 @@ TIME_LIMIT = 600
 FLUIDS_ARGS = {"visualization_level": 3,
                "fps": 30,
                "obs_args": {"obs_dim": OBS_W},
-               "obs_space": fluids.OBS_GRID,
+               "obs_space": fluids.OBS_VEC,
                "background_control": fluids.BACKGROUND_CSP}
 
 STATE_ARGS = {"layout": fluids.STATE_CITY,
