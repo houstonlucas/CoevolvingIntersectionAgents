@@ -99,6 +99,7 @@ class Car(Shape):
         self.cached_blob = self.get_future_shape()
         self.path = path
         self.keep_random = False
+        self.generated_first_traj = False
 
     def make_observation(self, obs_space=OBS_NONE, **kwargs):
         if obs_space == OBS_NONE:
@@ -165,7 +166,10 @@ class Car(Shape):
         else:
             fluids_assert(False, "Car received an illegal action")
 
-        while len(self.waypoints) < self.planning_depth and len(self.waypoints) and len(self.waypoints[-1].nxt):
+        while len(self.waypoints) < self.planning_depth \
+                and len(self.waypoints) \
+                and len(self.waypoints[-1].nxt)\
+                and not self.generated_first_traj:
             if len(self.waypoints[-1].nxt) > 1:
                 if self.path == -1 or self.keep_random:
                     next_edge = random.choice(self.waypoints[-1].nxt)
@@ -181,6 +185,8 @@ class Car(Shape):
             self.trajectory.append(((self.waypoints[-1].x, self.waypoints[-1].y),
                                     (next_waypoint.x, next_waypoint.y), line))
             self.waypoints.append(next_waypoint)
+
+        self.generated_first_traj = True
 
         self.last_to_goal = distance_to_next - self.dist_to(self.waypoints[0])
         self.last_distance = np.linalg.norm([self.x - startx, self.y - starty])
