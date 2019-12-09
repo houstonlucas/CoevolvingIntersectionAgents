@@ -196,6 +196,8 @@ class FluidSim(object):
         -------
 
         """
+        done = False
+
         fluids_assert(self.state, "step called without setting the state")
 
         car_keys = self.state.controlled_cars.keys()
@@ -223,8 +225,11 @@ class FluidSim(object):
 
         # Simulate the objects
         for k, v in iteritems(self.state.dynamic_objects):
-            self.state.objects[k].step(self.next_actions[k] if k in self.next_actions \
+            tempdone = self.state.objects[k].step(self.next_actions[k] if k in self.next_actions \
                                        else None)
+            if tempdone:
+                done = tempdone
+
 
         self.state.time += 1
 
@@ -235,7 +240,9 @@ class FluidSim(object):
         self.multiagent_plan()
         self.save_data()
 
-        return reward_step
+        return reward_step, done
+
+
     def get_observations(self, keys={}):
         """
         Get observations from controlled cars in the scene.

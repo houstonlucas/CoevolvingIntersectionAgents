@@ -65,10 +65,10 @@ class FluidsEnv(gym.Env):
         car_keys = list(self.fluidsim.get_control_keys())
         assert (len(car_keys) == 1)
         actions = {car_keys[0]: self.fluids_action_maker(action)}
-        reward_step = self.fluidsim.step(actions)
+        reward_step, done = self.fluidsim.step(actions)
         obs = self.fluidsim.get_observations(car_keys)
 
-        done = self.fluidsim.run_time() > TIME_LIMIT
+        done = self.fluidsim.run_time() > TIME_LIMIT or done
         obs = obs[car_keys[0]].get_array()
         info_dict = {"supervisor_action": self.fluidsim.get_supervisor_actions(keys=car_keys,
                                                                                action_type=self.fluids_action_type)

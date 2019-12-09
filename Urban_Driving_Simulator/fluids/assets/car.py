@@ -43,7 +43,7 @@ def calc_jerk(last_four_positions):
 
 class Car(Shape):
     def __init__(self, vel=0, mass=400, max_vel=5,
-                 planning_depth=10, path=-1, **kwargs):
+                 planning_depth=13, path=-1, **kwargs):
         from fluids.assets import Lane, Car, Pedestrian, TrafficLight, Terrain, Sidewalk, PedCrossing
         collideables = [Car,
                         Pedestrian]
@@ -137,6 +137,9 @@ class Car(Shape):
         self.running_time += 1
 
     def step(self, action):
+
+        if len(self.waypoints) <= 0:
+            return True
 
         distance_to_next = self.dist_to(self.waypoints[0])
         startx, starty = self.x, self.y
