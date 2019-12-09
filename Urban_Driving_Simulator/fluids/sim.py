@@ -233,7 +233,7 @@ class FluidSim(object):
                 print("REWARD: Collisions {:.3f}, Infractions {:.3f}, liveliness {:.3f}, jerk {:.3f}, traj_follow {:.3f}"
                       .format(car.total_collisions,
                               car.total_infractions,
-                              (car.total_time*(car.total_time + 1))/2,
+                              car.total_time,
                               car.total_jerk,
                               car.total_traj_follow))
                 print("REWARD: Total reward {:.3f}".format(car.total_reward))

@@ -26,7 +26,7 @@ def path_reward(state):
             infraction = 0.0
 
         # get liveliness
-        liveliness = -1.0 * c.total_time
+        liveliness = -1.0
 
         # get jerk
         jerk = -1.0 * c.jerk
