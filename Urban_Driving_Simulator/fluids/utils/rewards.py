@@ -6,8 +6,6 @@ TRAJ_WEIGHT = 1.0
 
 
 def path_reward(state):
-    total_reward = 0
-
     # Get cars
     controlled_cars = [state.objects[k] for k in state.controlled_cars.keys()]
 
@@ -43,8 +41,7 @@ def path_reward(state):
         # update reward for car
         c.current_reward = reward
 
-        # add reward to total
-        total_reward += reward
-
+    print("REWARD: Collisions-{:.3f} Infractions-{:.3f} liveliness-{:.3f} jerk-{:.3f} traj_follow-{:.3f}".format(collision, infraction, liveliness, jerk, traj_follow))
+    print("REWARD: Current reward-{:.3f}".format(reward))
     # Return final metric
-    return total_reward
+    return reward
