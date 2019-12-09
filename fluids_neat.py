@@ -8,20 +8,34 @@ import os
 import gym
 import gym_fluids
 from matplotlib import pyplot as plt
+# import ray
+from multiprocessing import Pool
 
 env_name = 'fluids-1-v2'
 
 
 def eval_genomes(genomes, config):
-    env = gym.make(env_name)
+    p = Pool(10)
+    inputs = [(genome_id, genome, config) for genome_id, genome in genomes]
+    id_fitnesses = p.map(run_set, inputs)
     for genome_id, genome in genomes:
-        genome.fitness = 0.0
-        num_runs = 5
-        num_steps_per_run = 1000
-        net = neat.nn.FeedForwardNetwork.create(genome, config)
-        for run_i in range(num_runs):
-            genome.fitness += single_run(net, env, num_steps_per_run)
-        genome.fitness /= num_runs
+        for id, fitness in id_fitnesses:
+            if genome_id == id:
+                genome.fitness = fitness
+                break
+
+
+def run_set(triplet):
+    genome_id, genome, config = triplet
+    env = gym.make(env_name)
+    genome.fitness = 0.0
+    num_runs = 5
+    num_steps_per_run = 1000
+    net = neat.nn.FeedForwardNetwork.create(genome, config)
+    for run_i in range(num_runs):
+        genome.fitness += single_run(net, env, num_steps_per_run)
+    genome.fitness /= num_runs
+    return genome_id, genome.fitness
 
 
 def single_run(net, env, num_steps_per_run):
@@ -77,6 +91,7 @@ def run(config_file):
 
 
 if __name__ == '__main__':
+    # ray.init()
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, 'config-feedforward')
     run(config_path)
