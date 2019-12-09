@@ -169,7 +169,7 @@ class Car(Shape):
         while len(self.waypoints) < self.planning_depth \
                 and len(self.waypoints) \
                 and len(self.waypoints[-1].nxt)\
-                and not self.generated_first_traj:
+                and not (self.generated_first_traj and self.color == (0x0b, 0x04, 0xf4)):
             if len(self.waypoints[-1].nxt) > 1:
                 if self.path == -1 or self.keep_random:
                     next_edge = random.choice(self.waypoints[-1].nxt)
