@@ -41,7 +41,7 @@ def path_reward(state):
         # update reward for car
         c.current_reward = reward
 
-    print("REWARD: Collisions-{:.3f} Infractions-{:.3f} liveliness-{:.3f} jerk-{:.3f} traj_follow-{:.3f}".format(collision, infraction, liveliness, jerk, traj_follow))
-    print("REWARD: Current reward-{:.3f}".format(reward))
+    # print("REWARD: Collisions-{:.3f} Infractions-{:.3f} liveliness-{:.3f} jerk-{:.3f} traj_follow-{:.3f}".format(collision, infraction, liveliness, jerk, traj_follow))
+    # print("REWARD: Current reward-{:.3f}".format(reward))
     # Return final metric
     return reward

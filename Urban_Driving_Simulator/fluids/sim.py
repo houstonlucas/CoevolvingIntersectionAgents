@@ -229,6 +229,15 @@ class FluidSim(object):
                                        else None)
             if tempdone:
                 done = tempdone
+                car = self.state.objects[k]
+                print("REWARD: Collisions {:.3f}, Infractions {:.3f}, liveliness {:.3f}, jerk {:.3f}, traj_follow {:.3f}"
+                      .format(car.total_collisions,
+                              car.total_infractions,
+                              (car.total_time*(car.total_time + 1))/2,
+                              car.total_jerk,
+                              car.total_traj_follow))
+                print("REWARD: Total reward {:.3f}".format(car.total_reward))
+
 
 
         self.state.time += 1
@@ -295,7 +304,7 @@ class FluidSim(object):
                                     self.next_actions[k].get_action())
                     for k in keys}
         else:
-            fluids_assert(false, "Illegal action type")
+            fluids_assert(False, "Illegal action type")
 
     def multiagent_plan(self):
         if self.background_control == BACKGROUND_NULL:
