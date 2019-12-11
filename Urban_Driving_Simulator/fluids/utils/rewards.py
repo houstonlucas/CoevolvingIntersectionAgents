@@ -1,6 +1,6 @@
 COLLISION_SCALE = 50.0
 INFRACTION_SCALE = 50.0
-LIVELINESS_SCALE = 300.0
+LIVELINESS_SCALE = 400.0
 JERK_SCALE = 10.0
 TRAJ_SCALE = 400.0
 
@@ -38,7 +38,8 @@ def path_reward(state):
             infraction = 0.0
 
         # get liveliness
-        liveliness = -1.0
+        # liveliness = -1.0 # This was for using time, which we are no longer using
+        liveliness = c.vel/c.max_vel
 
         # get jerk
         jerk = -1.0 * c.jerk

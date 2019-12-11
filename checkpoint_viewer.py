@@ -11,7 +11,7 @@ from multiprocessing import Pool
 
 
 env_name = 'fluids-1-v2'
-checkpoint_to_restore = 'neat-checkpoint-36'
+checkpoint_to_restore = 'neat-checkpoint-35'
 
 
 def eval_genomes(genomes, config):
