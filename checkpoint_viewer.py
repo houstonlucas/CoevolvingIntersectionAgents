@@ -18,7 +18,6 @@ def eval_genomes(genomes, config):
     p = Pool(10)
     inputs = [(genome_id, genome, config) for genome_id, genome in genomes]
     id_fitnesses = p.map(run_set, inputs)
-    p.join()
     p.close()
     for genome_id, genome in genomes:
         for id, fitness in id_fitnesses:
@@ -31,7 +30,7 @@ def run_set(triplet):
     genome_id, genome, config = triplet
     env = gym.make(env_name)
     genome.fitness = 0.0
-    num_runs = 5
+    num_runs = 1
     num_steps_per_run = 1000
     net = neat.nn.FeedForwardNetwork.create(genome, config)
     for run_i in range(num_runs):
@@ -62,7 +61,7 @@ def run(config_file):
     winner_net = neat.nn.FeedForwardNetwork.create(winner, config)
 
     env = gym.make(env_name)
-    num_runs = 5
+    num_runs = 2
     num_steps_per_run = 1000
     total_reward = 0.0
     for run_i in range(num_runs):

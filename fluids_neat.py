@@ -18,6 +18,7 @@ def eval_genomes(genomes, config):
     p = Pool(10)
     inputs = [(genome_id, genome, config) for genome_id, genome in genomes]
     id_fitnesses = p.map(run_set, inputs)
+    p.close()
     for genome_id, genome in genomes:
         for id, fitness in id_fitnesses:
             if genome_id == id:
