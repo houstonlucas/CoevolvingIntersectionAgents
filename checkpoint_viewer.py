@@ -39,7 +39,7 @@ def run_set(triplet):
     return genome_id, genome.fitness
 
 
-def single_run(net, env, num_steps_per_run,render=False):
+def single_run(net, env, num_steps_per_run):
     total_reward = 0.0
     obs = env.reset()
     for step_i in range(num_steps_per_run):
