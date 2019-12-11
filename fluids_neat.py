@@ -1,4 +1,4 @@
-
+import fluids
 import neat
 import numpy as np
 
@@ -8,10 +8,10 @@ import os
 import gym
 import gym_fluids
 from matplotlib import pyplot as plt
-# import ray
 from multiprocessing import Pool
 
-env_name = 'fluids-1-v2'
+env_names = ['fluids-1-v2', 'fluids-2-v2', 'fluids-3-v2']
+only_accel = True
 
 
 def eval_genomes(genomes, config):
@@ -28,22 +28,28 @@ def eval_genomes(genomes, config):
 
 def run_set(triplet):
     genome_id, genome, config = triplet
-    env = gym.make(env_name)
     genome.fitness = 0.0
-    num_runs = 5
-    num_steps_per_run = 1000
-    net = neat.nn.FeedForwardNetwork.create(genome, config)
-    for run_i in range(num_runs):
-        genome.fitness += single_run(net, env, num_steps_per_run)
-    genome.fitness /= num_runs
+    for env_name in env_names:
+        env = gym.make(env_name)
+        num_runs = 1
+        num_steps_per_run = 1000
+        net = neat.nn.FeedForwardNetwork.create(genome, config)
+        for run_i in range(num_runs):
+            genome.fitness += single_run(net, env, num_steps_per_run)
+    genome.fitness /= num_runs*len(env_names)
     return genome_id, genome.fitness
 
 
 def single_run(net, env, num_steps_per_run):
     total_reward = 0.0
     obs = env.reset()
+    car_keys = env.env.fluidsim.get_control_keys()
     for step_i in range(num_steps_per_run):
         action = net.activate(obs)
+        if only_accel:
+            actions = env.env.fluidsim.get_supervisor_actions(fluids.SteeringVelAction,
+                                                              keys=car_keys)
+            action[0] = actions[list(car_keys)[0]].steer
         obs, reward, done, _ = env.step(action)
         total_reward += reward
         if done:
@@ -66,7 +72,7 @@ def run(config_file):
     p.add_reporter(neat.Checkpointer(20))
 
     # Run for up to 300 generations.
-    winner = p.run(eval_genomes, 300)
+    winner = p.run(eval_genomes, 500)
 
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
@@ -81,12 +87,25 @@ def run(config_file):
     print('\nOutput:')
     winner_net = neat.nn.FeedForwardNetwork.create(winner, config)
 
-    env = gym.make(env_name)
-    num_runs = 5
-    num_steps_per_run = 1000
     total_reward = 0.0
-    for run_i in range(num_runs):
-        single_run(winner_net, env, num_steps_per_run)
+    num_steps_per_run = 1000
+    for env_name in env_names:
+        env = gym.make(env_name)
+        num_runs = 1
+        for run_i in range(num_runs):
+            obs = env.reset()
+            car_keys = env.env.fluidsim.get_control_keys()
+            for step_i in range(num_steps_per_run):
+                action = winner_net.activate(obs)
+                if only_accel:
+                    actions = env.env.fluidsim.get_supervisor_actions(fluids.SteeringVelAction,
+                                                                      keys=car_keys)
+                    action[0] = actions[list(car_keys)[0]].steer
+                obs, reward, done, _ = env.step(action)
+                total_reward += reward
+                env.render()
+                if done:
+                    break
 
     print("Average reward per run: {}".format(total_reward/num_runs))
 
