@@ -55,6 +55,8 @@ class FluidSim(object):
                  background_control=BACKGROUND_NULL,
                  reward_fn=REWARD_PATH,
                  screen_dim=800,
+                 obeys_lights=True,
+                 obeys_cars=True
                  ):
 
         self.state = None
@@ -78,6 +80,8 @@ class FluidSim(object):
         self.last_obs = {}
         self.next_actions = {}
         self.data_saver = None
+        self.obey_lights = obeys_lights
+        self.obey_cars = obeys_cars
 
     def __del__(self):
         pygame.quit()
@@ -364,15 +368,18 @@ class FluidSim(object):
 
                     # We know at this point that if both cars move, there is collision,
                     #  so add a constraint for that here
-                    solver.Add(k1v + k2v < 2)
+                    if self.obey_cars:
+                        solver.Add(k1v + k2v < 2)
 
                     # If car2 will collide when it moves, prevent it from moving
                     if not f1:
-                        solver.Add((k2v == 1) == False)
+                        if self.obey_cars:
+                            solver.Add((k2v == 1) == False)
 
                     # If car1 will collide when it moves, prevent it from moving
                     if not f2:
-                        solver.Add((k1v == 1) == False)
+                        if self.obey_cars:
+                            solver.Add((k1v == 1) == False)
 
             # For every car-ped pair
             for k2x in range(len(ped_keys)):
@@ -397,7 +404,8 @@ class FluidSim(object):
                 #  limit the movement of the car
                 if flc == "red" and futures[k1].intersects(fl.shapely_obj) \
                         and not car1.intersects(fl):
-                    solver.Add(k1v == 0)
+                    if self.obey_lights:
+                        solver.Add(k1v == 0)
 
         # For every ped-light pair
         for k1x in range(len(ped_keys)):
