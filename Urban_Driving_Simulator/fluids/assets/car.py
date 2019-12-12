@@ -91,6 +91,7 @@ class Car(Shape):
         self.total_collisions = 0.0
         self.total_infractions = 0.0
         self.total_time = 0.0
+        self.total_liveliness = self.vel/self.max_vel
         self.total_jerk = self.jerk
         self.total_traj_follow = self.last_to_goal
         self.total_reward = 0.0
@@ -212,10 +213,11 @@ class Car(Shape):
         self.jerk = calc_jerk(self.last_four_positions)
 
         # Update total reward
-        # Collisions are handled by the rewards function
+        # Collisions/infractions are handled by the rewards function
         self.total_time += 1
         self.total_jerk += self.jerk
         self.total_traj_follow += self.last_to_goal
+        self.total_liveliness += self.vel / self.max_vel
 
         # This might cause issues because current reward is only updated when the reward function is called
         self.total_reward += self.current_reward

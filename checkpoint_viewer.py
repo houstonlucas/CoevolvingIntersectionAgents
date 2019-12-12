@@ -17,7 +17,7 @@ only_accel = True
 
 
 def eval_genomes(genomes, config):
-    p = Pool(10)
+    p = Pool(2)
     inputs = [(genome_id, genome, config) for genome_id, genome in genomes]
     id_fitnesses = p.map(run_set, inputs)
     p.close()
