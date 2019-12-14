@@ -18,7 +18,7 @@ from fluids.actions import *
 from fluids.consts import *
 from fluids.obs import GridObservation
 from fluids.datasaver import DataSaver
-
+from time import time
 
 class FluidSim(object):
     """
@@ -168,6 +168,7 @@ class FluidSim(object):
             self.clock.tick(0)
             if not self.state.time % 60:
                 fluids_print("FPS: " + str(int(self.clock.get_fps())))
+        # pygame.image.save(self.surface, f'/home/gaetano/Desktop/images/scene_6_safe/pic_{time()}.png')
 
     def get_control_keys(self):
         """
@@ -368,7 +369,7 @@ class FluidSim(object):
 
                     # We know at this point that if both cars move, there is collision,
                     #  so add a constraint for that here
-                    if self.obey_cars:
+                    if self.obey_cars or k1 in self.get_control_keys():
                         solver.Add(k1v + k2v < 2)
 
                     # If car2 will collide when it moves, prevent it from moving
@@ -378,7 +379,7 @@ class FluidSim(object):
 
                     # If car1 will collide when it moves, prevent it from moving
                     if not f2:
-                        if self.obey_cars:
+                        if self.obey_cars or k1 in self.get_control_keys():
                             solver.Add((k1v == 1) == False)
 
             # For every car-ped pair
@@ -404,7 +405,7 @@ class FluidSim(object):
                 #  limit the movement of the car
                 if flc == "red" and futures[k1].intersects(fl.shapely_obj) \
                         and not car1.intersects(fl):
-                    if self.obey_lights:
+                    if self.obey_lights or k1 in self.get_control_keys():
                         solver.Add(k1v == 0)
 
         # For every ped-light pair

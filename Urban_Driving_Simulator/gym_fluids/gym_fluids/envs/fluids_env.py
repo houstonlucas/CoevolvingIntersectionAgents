@@ -124,7 +124,7 @@ class FluidsEnv1(FluidsEnv):
 
 class FluidsEnv2(FluidsEnv):
     def __init__(self):
-        FLUIDS_ARGS["obeys_lights"] = False
+        FLUIDS_ARGS["obeys_lights"] = True
         FLUIDS_ARGS["obeys_cars"] = False
         self.fluidsim = fluids.FluidSim(**FLUIDS_ARGS)
         self.action_space = spaces.Box(np.array([-1, -1]), np.array([1, 1]))
@@ -141,7 +141,7 @@ class FluidsEnv2(FluidsEnv):
 
 class FluidsEnv3(FluidsEnv):
     def __init__(self):
-        FLUIDS_ARGS["obeys_lights"] = False
+        FLUIDS_ARGS["obeys_lights"] = True
         FLUIDS_ARGS["obeys_cars"] = False
         self.fluidsim = fluids.FluidSim(**FLUIDS_ARGS)
         self.action_space = spaces.Box(np.array([-1, -1]), np.array([1, 1]))
