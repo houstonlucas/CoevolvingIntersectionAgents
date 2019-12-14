@@ -168,6 +168,8 @@ class FluidSim(object):
             self.clock.tick(0)
             if not self.state.time % 60:
                 fluids_print("FPS: " + str(int(self.clock.get_fps())))
+
+        ### Uncomment the next line to output images (remember to add you write directory) ###
         # pygame.image.save(self.surface, f'/home/gaetano/Desktop/images/scene_6_safe/pic_{time()}.png')
 
     def get_control_keys(self):
@@ -232,7 +234,7 @@ class FluidSim(object):
                 print("REWARD: Collisions {:.3f}, Infractions {:.3f}, liveliness {:.3f}, jerk {:.3f}, traj_follow {:.3f}"
                       .format(car.total_collisions,
                               car.total_infractions,
-                              car.total_time,
+                              car.total_liveliness,
                               car.total_jerk,
                               car.total_traj_follow))
                 print("REWARD: Total reward {:.3f}".format(car.total_reward))
@@ -369,6 +371,8 @@ class FluidSim(object):
 
                     # We know at this point that if both cars move, there is collision,
                     #  so add a constraint for that here
+                    # swap the next if statements for the agent that cannot predict the other cars trajectory.
+                    # if self.obey_cars:
                     if self.obey_cars or k1 in self.get_control_keys():
                         solver.Add(k1v + k2v < 2)
 

@@ -105,6 +105,7 @@ class FluidsEnv(gym.Env):
         self.fluidsim.render()
 
 
+
 class FluidsEnv1(FluidsEnv):
     def __init__(self):
         FLUIDS_ARGS["obeys_lights"] = True
