@@ -170,7 +170,7 @@ class FluidSim(object):
                 fluids_print("FPS: " + str(int(self.clock.get_fps())))
 
         ### Uncomment the next line to output images (remember to add you write directory) ###
-        # pygame.image.save(self.surface, f'/home/gaetano/Desktop/images/scene_6_safe/pic_{time()}.png')
+        # pygame.image.save(self.surface, f'/home/gaetano/Desktop/images/winners/with_steering/agent_4/pic_{time()}.png')
 
     def get_control_keys(self):
         """

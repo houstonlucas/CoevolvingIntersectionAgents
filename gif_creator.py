@@ -1,9 +1,10 @@
 import gym
 import gym_fluids
 import os
-from PIL import Image, ImageDraw
+from PIL import Image
 
-path = '/home/gaetano/Desktop/images/'
+path = '/home/gaetano/Desktop/images/winners/with_steering/'
+# path = '/home/gaetano/Desktop/images/'
 sub_directories = []
 dir_name = []
 for r, d, _ in os.walk(path):
