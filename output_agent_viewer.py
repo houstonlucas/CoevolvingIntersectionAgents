@@ -7,10 +7,10 @@ import gym
 import gym_fluids
 from multiprocessing import Pool
 
-env_name = 'fluids-1-v2'
+env_name = 'fluids-3-v2'
 only_accel = False
 path = '/home/gaetano/Desktop/winners/'
-winner_name = 'winner_set0.pkl'
+winner_name = 'winner_set3.pkl'
 
 
 def run(config_file):
@@ -40,16 +40,6 @@ def run(config_file):
         if done:
             break
 
-    # Get the metrics to return
-    car = env.env.fluidsim.state.controlled_cars[controlled_key]
-    metrics = {}
-    metrics["collisions"] = car.total_collisions
-    metrics["infractions"] = car.total_infractions
-    metrics["livelieness"] = car.total_liveliness
-    metrics["jerk"] = car.total_jerk
-    metrics["traj_following"] = car.total_traj_follow
-    metrics["final_reward"] = reward
-    print(metrics)
 if __name__ == '__main__':
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, 'config-feedforward')
