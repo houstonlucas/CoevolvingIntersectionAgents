@@ -1,11 +1,11 @@
 import gym
 import gym_fluids
-import collections, functools, operator
+import collections
 
 envs = ['fluids-1-v2', 'fluids-2-v2', 'fluids-3-v2', 'fluids-4-v2', 'fluids-5-v2', 'fluids-6-v2']
 meta_metrics = []
 
-for i, env_name in enumerate(envs):
+for env_name in envs:
     env = gym.make(env_name)
     env.reset()
 
